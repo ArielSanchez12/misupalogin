@@ -57,9 +57,15 @@ export class SupabaseService {
   }
 
   async addMessage(content: string) {
+    const session = this._session$.getValue();
+    if (!session || !session.user) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const { email } = session.user;
     const { error } = await this.supabase
       .from('messages')
-      .insert({ content });
+      .insert({ content, autor: email });
     if (error) throw error;
   }
 
